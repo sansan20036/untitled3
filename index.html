@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>模擬選課系統</title>
+    <!-- 引入 CSS 檔案 -->
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Basic Layout</title>
+        <style>
+            /* Reset CSS */
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            /* 全域樣式 */
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                background-color: #f8f8f8;
+                color: #333;
+                padding: 20px;
+            }
+
+            .container {
+                width: 80%;
+                margin: auto;
+                overflow: hidden;
+            }
+
+            /* 頁首樣式 */
+            header {
+                background: #333;
+                color: #fff;
+                padding-top: 30px;
+                min-height: 70px;
+                border-bottom: #ddd 1px solid;
+            }
+
+            header h1 {
+                text-align: center;
+            }
+
+            /* 導覽列樣式 */
+            nav {
+                float: left;
+                width: 30%;
+                text-align: center;
+            }
+
+            nav ul {
+                list-style: none;
+                padding: 0;
+            }
+
+            nav ul li {
+                display: inline;
+                margin-right: 10px;
+            }
+
+            nav ul li a {
+                color: #fff;
+                text-decoration: none;
+            }
+
+            /* 主要內容區塊 */
+            .main {
+                float: right;
+                width: 70%;
+                padding: 20px;
+                background: #fff;
+                border: #ddd 1px solid;
+            }
+
+            /* 響應式設計 */
+            @media (max-width: 768px) {
+                nav, .main {
+                    width: 100%;
+                    float: none;
+                }
+            }
+        </style>
+    </head>
+    <body>
+
+    <div class="container">
+
+    </div>
+
+    </body>
+    </html>
+
+    <!-- 引入 JavaScript 檔案 -->
+    <script src="main.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>選課系統</h1>
+</header>
+
+<main>
+    <section id="course-filter">
+        <h2>課程篩選</h2>
+        <form id="filter-form">
+            <label for="filter-department">科系：</label>
+            <select id="filter-department" name="filter-department">
+                <option value="資訊系">資訊系</option>
+                <option value="其他">其他</option>
+                <!-- 可以根據需求添加更多科系選項 -->
+            </select>
+            <br>
+            <label for="filter-type">課程類型：</label>
+            <select id="filter-type" name="filter-type">
+                <option value="all">全部</option>
+                <option value="compulsory">必修</option>
+                <option value="elective">選修</option>
+            </select>
+            <br>
+            <label for="filter-course-code">課程編號：</label>
+            <input type="text" id="filter-course-code" name="filter-course-code">
+            <br>
+            <label for="filter-course-name">課程名稱：</label>
+            <input type="text" id="filter-course-name" name="filter-course-name">
+            <br>
+            <label for="filter-teacher">授課教師：</label>
+            <input type="text" id="filter-teacher" name="filter-teacher">
+            <br>
+            <label for="filter-time">時間：</label>
+            <input type="text" id="filter-time" name="filter-time">
+            <br>
+            <button type="submit">搜尋</button>
+        </form>
+    </section>
+
+    <!-- 加選區塊 -->
+    <section id="add-course">
+        <h2>加選課程</h2>
+        <!-- 加選表單 -->
+        <form id="add-course-form">
+            <label for="course-id">課程編號：</label>
+            <input type="text" id="course-id" name="course-id" required>
+            <br>
+            <label for="course-name">課程名稱：</label>
+            <input type="text" id="course-name" name="course-name" required>
+            <br>
+            <label for="course-department">課程系所：</label>
+            <input type="text" id="course-department" name="course-department" required>
+            <br>
+            <label for="course-credits">課程學分：</label>
+            <input type="number" id="course-credits" name="course-credits" required>
+            <br>
+            <button type="submit">加選</button>
+        </form>
+    </section>
+
+    <!-- 顯示加選結果 -->
+    <div id="add-result"></div>
+
+    <script>
+        document.getElementById('add-course-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var courseId = document.getElementById('course-id').value;
+            var courseName = document.getElementById('course-name').value;
+            var courseDepartment = document.getElementById('course-department').value;
+            var courseCredits = parseInt(document.getElementById('course-credits').value);
+
+            // 發送加選課程的 POST 請求到後端
+            fetch('/add-course', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    courseId: courseId,
+                    courseName: courseName,
+                    courseDepartment: courseDepartment,
+                    courseCredits: courseCredits
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 清空原本的加選結果顯示
+                        document.getElementById('add-result').innerHTML = '';
+
+                        // 顯示加選成功訊息
+                        document.getElementById('add-result').innerText = '加選成功！';
+                    } else {
+                        // 顯示加選失敗訊息
+                        document.getElementById('add-result').innerText = '加選失敗，原因：' + data.message;
+                    }
+                })
+                .catch(error => {
+                    console.error('加選出錯:', error);
+                    document.getElementById('add-result').innerText = '加選出錯，請稍後重試。';
+                });
+        });
+    </script>
+
+
+    <!-- 退選區塊 -->
+    <section id="drop-course">
+        <h2>退選課程</h2>
+        <!-- 退選表單 -->
+        <form id="drop-course-form">
+            <label for="course-id">課程編號：</label>
+            <input type="text" id="course-id" name="course-id" required>
+            <br>
+            <label for="course-name">課程名稱：</label>
+            <input type="text" id="course-name" name="course-name" required>
+            <br>
+            <button type="submit">退選</button>
+        </form>
+    </section>
+
+    <!-- 顯示退選結果 -->
+    <div id="drop-result"></div>
+
+    <script>
+        document.getElementById('drop-course-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var courseId = document.getElementById('course-id').value;
+            var courseName = document.getElementById('course-name').value;
+
+            // 發送退選課程的 POST 請求到後端
+            fetch('/drop-course', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    courseId: courseId,
+                    courseName: courseName
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (data.warning) {
+                            // 顯示退選警告
+                            var confirmed = confirm(data.warning);
+                            if (!confirmed) {
+                                return; // 如果用戶取消退選，不顯示成功訊息
+                            }
+                        }
+
+                        // 清空原本的退選結果顯示
+                        document.getElementById('drop-result').innerHTML = '';
+
+                        // 顯示退選成功訊息
+                        document.getElementById('drop-result').innerText = '退選成功！';
+                    } else {
+                        // 顯示退選失敗訊息
+                        document.getElementById('drop-result').innerText = '退選失敗，請重試！';
+                    }
+                })
+                .catch(error => {
+                    console.error('退選出錯:', error);
+                    document.getElementById('drop-result').innerText = '退選出錯，請稍後重試。';
+                });
+        });
+    </script>
+
+    <section id="timetable">
+        <h2>課表</h2>
+        <!-- 課表內容 -->
+        <table id="timetable-table" border="1">
+            <tr>
+                <th>時間</th>
+                <th>周一</th>
+                <th>周二</th>
+                <th>周三</th>
+                <th>周四</th>
+                <th>周五</th>
+                <th>周六</th>
+                <th>周日</th>
+            </tr>
+            <tr>
+                <td>08:00 AM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>09:00 AM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>10:00 AM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>11:00 AM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>12:00 PM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>13:00 PM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>14:00 PM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>15:00 PM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>16:00 PM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>17:00 PM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>18:00 PM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>19:00 PM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>20:00 PM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>21:00 PM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>22:00 PM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </section>
+
+</main>
+<footer>
+    <p>© 2024 選課系統</p>
+</footer>
+</body>
+</html>
